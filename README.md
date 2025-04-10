@@ -17,5 +17,6 @@ DifferentialEquations, OrdinaryDiffEq, Sundials, LinearAlgebra, LogExpFunctions,
 
 # How to cite
 
-If you are using this package please cite the following: 
-[citation here]
+If you are using this package please cite the following:
+\
+[Kim, J., Santos, J. A., Alkema, M. J., & Shlizerman, E. (2019). Whole integration of neural connectomics, dynamics and bio-mechanics for identification of behavioral sensorimotor pathways in Caenorhabditis elegans. bioRxiv, 724328.]
