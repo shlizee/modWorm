@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>modWorm: Modular simulation framework for modeling and integrating neural connectomics, dynamics and biomechanics for <i>Caenorhabditis elegans</i></title>
+    <script>
+    function setPlaySpeed() { 
+        var vid = document.getElementsByTagName("video");
+        for (i = 0; i < vid.length; i++) {
+           vid[i].playbackRate = 1.0;
+        }
+    } 
+    </script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default'></script>
+</head>
+<link rel="stylesheet" type="text/css" href="webpage/main.css" />
+
+<body onload="setPlaySpeed();">
+
+<div id="header" class="content">
+    <center>
+    <div class="row">
+        <h1>modWorm: Modular simulation framework for modeling and integrating neural connectomics, dynamics and biomechanics for <i>Caenorhabditis elegans</i></h1>
+        <div class="authors">
+            Jimin Kim<sup>1</sup>
+            &nbsp;
+            Jeremy T. Florman<sup>3</sup>
+            &nbsp;
+            Julia A. Santos<sup>2</sup>
+            &nbsp;
+            Mark J. Alkema<sup>3</sup>
+            &nbsp;
+            Eli Shlizerman<sup>1,2</sup>
+            <br>
+            <sup>1</sup>Electrical & Computer Engineering, &nbsp;&nbsp;&nbsp; <sup>2</sup>Applied Mathematics, &nbsp;&nbsp; University of Washington<br>
+            <sup>3</sup>Neurobiology, University of Massachusetts Medical School
+            <br>
+        </div>
+    </div>
+    </center>
+<br>
+<center><img width=90% src="webpage/img1.png" style="no-border;margin-left:0px;" class="noshadow"/></center><br>
+
+<i><b>modWorm</i></b> is a modeling framework for the nematode <i>Caenorhabditis elegans</i> using modular integration approach. modWorm allows for construction of a model as an integrated series of configurable, exchangeable modules each describing specific biophysical processes across different modalities (e.g., nervous system, muscles, body). Utilizing modWorm, we propose a base neuro-mechanical model for <i>C. elegans</i> built upon the complete connectome and integrates a series of 7 modules: i) intra-cellular dynamics, ii) electrical and iii) chemical extra-cellular neural dynamics, iv) translation of neural activity to muscle calcium dynamics, v) muscle calcium dynamics to muscle forces, vi) muscle forces to body postures and vii) proprioceptive feedback. 
+<br><br>
+We validate the base model by <i>in-silico</i> injection of constant currents into sensory and inter-neurons known to be associated with locomotion behaviors and by applying external forces to the body. Applications of <i>in-silico</i> neural stimuli experimentally known to modulate locomotion show that the model can recapitulate natural behavioral responses such as forward and backward locomotion as well as mid-locomotion stimuli induced responses such as avoidance and turns. Furthermore, through <i>in-silico</i> ablation surveys, the model can infer novel neural circuits involved in sensorimotor behaviors. To further dissect mechanisms of locomotion, we utilize modWorm to introduce empirical based variations of intra and extra-cellular dynamics as well as model optimizations on associated parameters to elucidate their effects on simulated locomotion dynamics compared to experimental findings.
+
+<h2>Motivation</h2>
+
+<figure>
+<center><img width=90% src="webpage/img2.png" style="no-border;margin-left:0px;" class="noshadow"/></center>
+<figcaption><font size=2>From left to right: Schematics of each model aspect as flowchart for the nervous system (blue), map to muscles (orange) and biomechanical model (green). Black highlighted boxes connected with solid lines are model aspects chosen by the proposed base model and boxes with dark gray dotted edges represent the variations considered in the paper.</font></figcaption>
+</figure>
+
+Nematode organism <i>C. elegans</i> is considered a model organism for studying neural dynamics translation to behavior due to the availability of its complete connectome mappings. While groups of sensory-, inter- and motor-neurons have been associated with various types of locomotion and sensorimotor interactions, it is still not fully resolved how these mechanisms are incorporated on a network level in <i>C. elegans</i> and what types of neural interactions lead to locomotion behaviors. <br><br>
+
+A central reason for the complexity stems from biophysical dynamics additional to the connectome encompassing dynamic neural responses and body bio-mechanics. Integrating such dynamics with varying scopes and modalities on top of connectomes introduce challenges in developing an integrated nervous system - biomechanics model of <i>C. elegans</i>. <br><br>
+
+modWorm project aims to address these challenges by achieving three main aims: <br><br> 
+1. Develop a <b>modular simulation framework</b> for <i>C. elegans</i> where the model consists of a series of configurable, exchangeable biophysical <b>modules</b>. <br> 
+2. Propose <b>base model</b> for <i>C. elegans</i> neuro-mechanics incorporating the known experimental data on nervous system, muscles and body. <br> 
+3. Introduce <b>variations</b> to the base model inspired by both experimental data and optimization technicques. <br><br>
+
+More broadly, modWorm seeks to facilitate a computational investigation of constructing an initial base model followed by studying its variations and experimental validations. Such an iterative approach assists in making informed decisions in which the model incorporates and reflects future details and <i>in-vivo</i> findings into an expanding model of the organism.
+
+<h2>Locomotion scenarios</h2>
+One of the simulation scenarios of proposed model is base forward and backward locomotion movements that are similar in shape to translating sinusoidals. We show the simulated body dynamics generated by our model triggered by external wave force or neural stimuli. <br><br> For the former (wave force), we design a force wave traveling along the body with variable frequency to infer neural dynamics associated with it. These neural dynamics are then forward integrated by the nervous system to generate body postures. For the latter (neural stimuli), we inject simple stimuli into circuits associated with touch-tap response - posterior-touch triggered forward locomotion (sensory: PLM, inter: AVB or PVC), anterior touch triggered backward locomotion (sensory: ALM, inter: AVA, AVD, AVE). Simulations with proprioceptive feedback enabled are marked with (Feedback).
+
+<center>
+<table>
+    <tr>
+        <td align=center>
+            <div id="player", class="vid-border-exp">
+            </div>
+            <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+            <script type="text/javascript">
+            var player;
+            var player2;
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player('player', {
+                    height: '250',
+                    width: '250',
+                    videoId: 'olrkWpCqVCE',
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+                player2 = new YT.Player('player2', {
+                    height: '250',
+                    width: '250',
+                    videoId: 'olrkWpCqVCE',
+                    events: {
+                        'onReady': onPlayerReady2,
+                        'onStateChange': onPlayerStateChange2
+                    }
+                });
+            }
+            function onPlayerReady(event) {
+                loopStart();
+                player.playVideo();
+            }
+            function loopStart() {
+                player.seekTo(0);   // Start at 7 seconds
+            }
+            function onPlayerStateChange(event) {
+                if (event.data == YT.PlayerState.PLAYING) {
+                    setTimeout(loopStart, 2400); // After 5 seconds, restart the loop
+                }
+            }
+            </script>
+            <br>
+            <font>Experimental (Youtube, credit: MIT)</font>
+        </td>    
+        <td align=center>
+         <div class="vid-border">
+          <video width="250" height="250" controls="controls">
+                <source src="webpage/Fig2/Fig2_fwd_wave.mp4" autostart="false" type="video/mp4">
+            </video>            
+            </div>
+            <br>
+            <font>Wave Force</font>
+        </td>    
+        <td align=center>
+            <div class="vid-border">
+            <video width="250" height="250" controls="controls">
+                <source src="webpage/Fig4/Fig4B_fwd_wave_fdb.mp4" autostart="false" type="video/mp4">
+            </video>            
+            </div>
+            <br>
+            <font>Feedback - Wave Force Initiation</font>
+        </td>    
+        <td align=center>
+            <div class="vid-border">
+            <video width="250" height="250" controls="controls">
+                <source src="webpage/Fig4/Fig4B_fwd_neural_fdb.mp4" autostart="false" type="video/mp4">
+            </video>
+            </div>
+            <br>
+            <font>Feedback - Neural Initiation</font>
+        </td>
+    </tr>  
+</table>
+</center>
+<center>
+<table>
+    <tr> 
+        <td align=center>
+            <div id="player2", class="vid-border-exp">
+            </div>
+            <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+            <script type="text/javascript">
+            var player2;
+
+            function onPlayerReady2(event) {
+                loopStart2();
+                player2.playVideo();
+            }
+            function loopStart2() {
+                player2.seekTo(2.6);   // Start at 7 seconds
+            }
+            function onPlayerStateChange2(event) {
+                if (event.data == YT.PlayerState.PLAYING) {
+                    setTimeout(loopStart2, 5000); // After 5 seconds, restart the loop
+                }
+            }
+            </script>
+            <br>
+            <font>Experimental (Youtube, credit: MIT)</font>
+        </td>    
+        <td align=center>
+         <div class="vid-border">
+          <video width="250" height="250" controls="controls">
+                <source src="webpage/Fig2/Fig2_bwd_wave.mp4" autostart="false" type="video/mp4">
+            </video>
+            </div>
+            <br>
+            <font>Wave Force</font>
+        </td>    
+        <td align=center>
+         <div class="vid-border">
+            <video width="250" height="250" controls="controls">
+                <source src="webpage/Fig4/Fig4B_bwd_wave_fdb.mp4" autostart="false" type="video/mp4">
+            </video>
+            </div>
+            <br>
+            <font>Feedback - Wave Force Initiation</font>
+        </td>    
+        <td align=center>
+         <div class="vid-border">
+            <video width="250" height="250" controls="controls">
+                <source src="webpage/Fig4/Fig4B_bwd_neural_fdb.mp4" autostart="false" type="video/mp4">
+            </video>
+            </div>
+            <br>
+            <font>Feedback - Neural Initiation</font>
+        </td>
+    </tr>  
+</table>
+</center>
+
+<h2>Complex scenarios</h2>
+We also explore more complex simulation scenarios such as stimulating additional neurons (with short pulses) during locomotion. Here we explore the effects of neural triggers identified experimentally to change the course of movement - avoidance pulse: stimulation of ALM + AVM, and turn pulse: stimulation of RIV. Additionally, we perform <i>in-silico</i> ablation for turn pulse where we ablate SMDV neurons to investigate its effect on simulated turn behavior. 
+<center>
+<table>
+     <td align=center> 
+        <div class="vid-border">
+         <video width="333" height="333" controls="controls">
+            <source src="webpage/Fig7/Fig7A_avoidance.mp4" autostart="false" type="video/mp4">
+        </video>
+        </div>
+        <br>
+        <font>Avoidance</font>
+    </td>
+    <td align=center>   
+        <div class="vid-border">
+         <video width="333" height="333" controls="controls">
+            <source src="webpage/Fig7/Fig7B_riv_during_fwd.mp4" autostart="false" type="video/mp4">
+        </video>
+        </div>
+        <br>
+        <font>RIV induced Turn (Control)</font>
+    </td>
+    <td align=center>      
+        <div class="vid-border">
+         <video width="333" height="333" controls="controls">
+            <source src="webpage/Fig7/Fig7C_riv_during_fwd_SMDV_Ablated.mp4" autostart="false" type="video/mp4">
+        </video>
+        </div>
+        <br>
+        <font>RIV induced Turn (SMDV Ablated)</font>
+    </td>       
+    </tr>
+</table>
+</center>
+
+<h2>Model variations</h2>
+What if we want to modify some of the model aspects? Here we modify connectome mappings and environmental parameters such as fluid viscosity in the base model. For the connectomes, we change from the version provided by (Varshney et al, 2011) to more recent version (Cook et al, 2019). For the fluid viscosity we change its value from $${0.01 Ns/m^2}$$ to $${0.001 Ns/m^2}$$ corresponding to agar-like viscosity to that of water.
+
+After modifications we observe that these variations indeed result in different forward locomotion postures where the worm now moves in slightly different direction with different body strokes due to the change in fluid viscosity.
+
+<center>
+<table>
+    <td align=center>   
+        <div class="vid-border">
+         <video width="500" height="500" controls="controls">
+            <source src="webpage/Model Variations/fwd_locomotion_ppc.mp4" autostart="false" type="video/mp4">
+        </video>
+        </div>
+        <br>
+        <font>Forward locomotion (Base model)</font>
+    </td>
+    <td align=center>      
+        <div class="vid-border">
+         <video width="500" height="500" controls="controls">
+            <source src="webpage/Model Variations/fwd_locomotion_ppc_custom.mp4" autostart="false" type="video/mp4">
+        </video>
+        </div>
+        <br>
+        <font>Forward locomotion (Updated connectomes + Fluid viscosity)</font>
+    </td>       
+    </tr>
+</table>
+</center>
+
+<h2>Fully configurable base model modules</h2>
+
+<figure>
+<center><img width=90% src="webpage/img3.png" style="no-border;margin-left:0px;" class="noshadow"/></center>
+<figcaption><font size=2><b>Base <i>C. elegans</i> neuro-mechanical model implemented in modWorm</b>. The model is comprised of individual modules (colored solid line boxes) each with parameter (grey) and dynamics equation space (white). Modules are combined to form systems (colored dotted line boxes) which are then integrated to form a model.</font></figcaption>
+</figure>
+
+modWorm defines three model classes according to their scopes and scales: i) Module, ii) System, iii) Model. These three classes are inclusive to one another such that Module ⊂ System ⊂ Model where a Module describes individual biophysical process within a system (e.g., individual ion channel current, synaptic current), System describes a specific system within the organism (e.g., nervous system, muscles, body) and Model describes the full system in its entirety described by the integration of Systems (e.g., neuro-mechanics). <br><br>
+
+All three model classes have two main components: parameters and dynamics equation space, which are fully customizable and describe the input-output relationship of the model. As the smallest model class, Modules serve as building blocks for larger model classes. Each Module’s parameter and dynamics equation spaces are either pre-defined by the framework or created by the user. All pre-defined Modules’ parameter spaces are fully configurable. A System is constructed by simply calling and combining the existing Modules to build its parameter and dynamics equation spaces. Different Systems can be further combined into a Model where users can configure how inputs and outputs of Systems interact during simulations.
+
+<h2>Want to try out modWorm? Follow the tutorial to get started</h2>
+
+<center>
+<table>
+    <tr> 
+        <td align=center>
+         <div class="vid-border-exp">
+            <video height="500" controls="controls">
+                <source src="webpage/Tutorial/Quickstart tutorial.mp4" autostart="false" type="video/mp4">
+            </video>
+            </div>
+        </td>
+    </tr>        
+</table>
+</center>
+
+<h2>modWorm Github repository</h2>
+
+modWorm is entirely open source! Visit our <a href="https://github.com/shlizee/modWorm" target="new">Github Repository</a> to download the code on your local computer. You can find the installation guides for Mac/Windows under /pdf_tutorials.
+
+<h2>Citation</h2>
+        <textarea readonly name="bibtex" class="bibtex" cols="60" rows="6">
+ @article{kim2019whole,  
+  title={Whole integration of neural connectomics, dynamics and bio-mechanics   
+         for identification of behavioral sensorimotor pathways in  
+         Caenorhabditis elegans},  
+  author={Kim, Jimin and Santos, Julia A and Alkema, Mark J and Shlizerman, Eli},  
+  journal={bioRxiv},  
+  pages={724328},  
+  year={2019},  
+  publisher={Cold Spring Harbor Laboratory}  
+}</textarea>
+
+<br><br>
+    
+<div id="footer"></div>
+
+</div>
+</body>
+</html>

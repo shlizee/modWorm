@@ -1,0 +1,120 @@
+{
+    "CaP": {
+        "name": "CaP",
+        "num_params": 5,
+        "param_list": ["GCa", "ECa", "VmCa", "kmCa", "tmCa"],
+        "num_vars": 1,
+        "var_list": ["mCa"]
+    },
+
+    "Kir": {
+        "name": "Kir",
+        "num_params": 4,
+        "param_list": ["gKir", "VKir", "kKir", "EKir"],
+        "num_vars": 0
+    },
+
+    "Kt": {
+        "name": "Kt",
+        "num_params": 8,
+        "param_list": ["gK", "Ek", "VmK", "kmk", "tmk", "Vhk", "khk", "thk"],
+        "num_vars": 2,
+        "var_list": ["mk", "hk"]
+    },
+
+    "SC": {
+        "name": "SC",
+        "num_params": 5,
+        "param_list": ["a", "b", "c", "d", "tau"],
+        "num_vars": 0
+    },
+
+    "SHK1_awa": {
+        "name": "SHK1_awa",
+        "num_params":27,
+        "param_list":["gK", "VK", "vk1", "vk2", "gKI", "gK2", "gK3", "gK4", "gK5", "gK6",
+                      "gK7", "TK", "vq1", "vq2", "vs1", "vs2", "TS", "TS2", "vb1", "vb2",
+                      "Tbk", "vp1", "vp2", "vtk1", "vtk2", "TKL", "TKH"],
+        "num_vars": 5,
+        "var_list":["w", "bk", "slo", "slo2", "kb"]
+
+    },
+
+    "EGL19_awa": {
+        "name": "EGL19_awa",
+        "num_params":12,
+        "param_list":["gCa", "VCa", "vm1", "vm2", "vm3", "vm4", "vt1", "vt2", "mx", "TC1",
+                      "TC2", "fac"],
+        "num_vars": 2,
+        "var_list":["c1", "c2"]
+
+    },
+
+    "UNC2_avl": {
+        "name": "UNC2_avl",
+        "num_params":14,
+        "param_list":["g_UNC2", "VCa", "m_a", "m_b", "m_c", "m_d", "m_e", "m_f", "h_a", "h_b",
+                      "h_c", "h_d", "h_e", "h_f"],
+        "num_vars": 2,
+        "var_list":["m", "h"]
+
+    },
+
+    "EGL19_avl": {
+        "name": "EGL19_avl",
+        "num_params":27,
+        "param_list":["g_EGL19", "VCa", "s_1", "s_2", "s_3", "s_4", "s_5", "s_6", "s_7", "s_8",
+                      "s_9", "s_10", "s_11", "s_12", "s_13", "s_14", "s_15", "q_1", "q_2", "q_3",
+                      "q_4", "q_5", "q_6", "q_7", "q_8", "q_9", "q_10"],
+        "num_vars": 2,
+        "var_list":["m", "h"]
+
+    },
+
+    "CCA1_avl": {
+        "name": "CCA1_avl",
+        "num_params":14,
+        "param_list":["g_CCA1", "VCa", "c_1", "c_2", "d_1", "d_2", "c_3", "c_4", "c_5", "c_6",
+                      "d_3", "d_4", "d_5", "d_6"],
+        "num_vars": 2,
+        "var_list":["m", "h"]
+
+    },
+
+    "SHL1_avl": {
+        "name": "SHL1_avl",
+        "num_params":20,
+        "param_list":["g_SHL1", "VK", "a_m", "b_m", "c_m", "d_m", "e_m", "f_m", "a_hf", "b_hf",
+                      "c_hf", "d_hf", "a_hs", "b_hs", "c_hs", "d_hs", "v_1", "v_2", "v_3", "v_4"],
+        "num_vars": 3,
+        "var_list":["m", "hf", "hs"]
+
+    },
+
+    "EGL36_avl": {
+        "name": "EGL36_avl",
+        "num_params":7,
+        "param_list":["g_EGL36", "VK", "e_1", "e_2", "t_f", "t_m", "t_s"],
+        "num_vars": 3,
+        "var_list":["mf", "mm", "ms"]
+
+    },
+
+    "EXP2_avl": {
+        "name": "EXP2_avl",
+        "num_params":18,
+        "param_list":["g_EXP2", "VK", "p_1", "p_2", "p_3", "p_4", "p_5", "p_6", "p_7", "p_8",
+                      "p_9", "p_10", "p_11", "p_12", "p_13", "p_14", "p_15", "p_16"],
+        "num_vars": 4,
+        "var_list":["C1", "C2", "C3", "O"]
+
+    },
+
+    "NCA_avl": {
+        "name": "NCA_avl",
+        "num_params":2,
+        "param_list":["g_NCA", "VNa"],
+        "num_vars": 0
+
+    }
+}
