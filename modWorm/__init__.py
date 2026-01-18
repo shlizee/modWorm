@@ -4,7 +4,7 @@ Copyright (c) 2024-2025 University of Washington. Developed in UW NeuroAI Lab by
 """
 
 __author__ = 'Jimin Kim: jk55@u.washington.edu'
-__version__ = '1.0.40'
+__version__ = '1.0.40.1'
 
 from julia import Main
 

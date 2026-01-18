@@ -260,7 +260,7 @@ Main.eval("""
 
         for ens_k = 1:size(NN_mb_ens)[1]
 
-            integration_prep = prep_network_integration_nv(NN_mb_ens[ens_k])
+            integration_prep = prep_network_integration_mb(NN_mb_ens[ens_k])
 
             push!(integration_prep_ens, integration_prep)
 
