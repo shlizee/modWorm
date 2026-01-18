@@ -45,10 +45,10 @@ def init_Initcond(NN_mb, x_offset = 0, y_offset = 0, orientation_angle = 0):
 # MASTER FUNCTIONS ##################################################################################################################################
 #####################################################################################################################################################
 
-def run_body(NN_mb, NN_nv, solution_dict_nv, stiffness = False):
+def run_body(NN_mb, NN_nv, solution_dict_nv, stiffness = False, rtol = 2.5e-6, atol = 1e-3):
 
     integration_prep = prep_body_integration(NN_mb, NN_nv, solution_dict_nv)
-    solution = integrate_ode(NN_mb, integration_prep, stiffness)
+    solution = integrate_ode(NN_mb, integration_prep, stiffness, rtol, atol)
 
     return solution
 
@@ -74,17 +74,17 @@ def prep_body_integration(NN_mb, NN_nv, solution_dict_nv, interp_method = 'linea
 
     return integration_prep
 
-def integrate_ode(NN_mb, integration_prep, stiffness):
+def integrate_ode(NN_mb, integration_prep, stiffness, rtol, atol):
 
     t_eval = np.linspace(0, integration_prep.tf, integration_prep.nsteps)
 
     if stiffness == False:
 
-        solver_method, rtol, atol = 'RK45', 2.5e-6, 1e-3
+        solver_method, rtol, atol = 'RK45', rtol, atol
 
     else:
 
-        solver_method, rtol, atol = 'Radau', 1e-6, 1e-6
+        solver_method, rtol, atol = 'Radau', rtol, atol
 
     sol = integrate.solve_ivp(fun = NN_mb.forward_Body,
                               t_span = [0, integration_prep.tf],
@@ -110,7 +110,7 @@ def integrate_ode(NN_mb, integration_prep, stiffness):
 # MASTER FUNCTIONS (Julia) ##########################################################################################################################
 #####################################################################################################################################################
 
-def run_body_julia_ensemble(NN_mb_ens, NN_nv_ens, solution_dict_nv_ens, stiffness = False, maxiters = 1e5, batch_size = 8):
+def run_body_julia_ensemble(NN_mb_ens, NN_nv_ens, solution_dict_nv_ens, stiffness = False, maxiters = 1e5, batch_size = 8, rtol = 2.5e-6, atol = 1e-3):
 
     NN_mb_ens[0].forward_Muscles()
     NN_mb_ens[0].forward_Body()
@@ -135,7 +135,7 @@ def run_body_julia_ensemble(NN_mb_ens, NN_nv_ens, solution_dict_nv_ens, stiffnes
 
         vars_NN_mb_ens.append(vars_NN_mb)
 
-    x0_sol_list, y0_sol_list, phi_sol_list = Main.run_body_ensemble(vars_NN_mb_ens, batch_size)
+    x0_sol_list, y0_sol_list, phi_sol_list = Main.run_body_ensemble(vars_NN_mb_ens, batch_size, rtol, atol)
 
     mb_solution_dict_ens = []
 
@@ -154,7 +154,7 @@ def run_body_julia_ensemble(NN_mb_ens, NN_nv_ens, solution_dict_nv_ens, stiffnes
 
     return mb_solution_dict_ens
 
-def run_body_julia(NN_mb, NN_nv, solution_dict_nv, stiffness = False, maxiters = 1e5):
+def run_body_julia(NN_mb, NN_nv, solution_dict_nv, stiffness = False, maxiters = 1e5, rtol = 2.5e-6, atol = 1e-3):
 
     NN_mb.forward_Muscles()
     NN_mb.forward_Body()
@@ -172,7 +172,7 @@ def run_body_julia(NN_mb, NN_nv, solution_dict_nv, stiffness = False, maxiters =
     vars_NN_mb["stiffness"] = stiffness
     vars_NN_mb["maxiters"] = maxiters
 
-    x0_sol, y0_sol, phi_sol = Main.run_body(vars_NN_mb)
+    x0_sol, y0_sol, phi_sol = Main.run_body(vars_NN_mb, rtol, atol)
 
     x, y = solve_xy(NN_mb, x0_sol, y0_sol, phi_sol)
     x_post, y_post = postprocess_xy(NN_mb, x, y)
@@ -187,7 +187,7 @@ def run_body_julia(NN_mb, NN_nv, solution_dict_nv, stiffness = False, maxiters =
 
 Main.eval("""
 
-    function run_body_ensemble(NN_mb_ens, batch_size)
+    function run_body_ensemble(NN_mb_ens, batch_size, rtol, atol)
 
         GC.gc()
 
@@ -196,13 +196,13 @@ Main.eval("""
         integration_prep_ens = prep_network_integration_mb_ensemble(NN_mb_ens)
         integrator_ens = configure_ode_solver_mb_ensemble(NN_mb_ens, integration_prep_ens)
 
-        x0_sol_list, y0_sol_list, phi_sol_list = integrate_ode_mb_ensemble(NN_mb_ens, integration_prep_ens, integrator_ens, batch_size)
+        x0_sol_list, y0_sol_list, phi_sol_list = integrate_ode_mb_ensemble(NN_mb_ens, integration_prep_ens, integrator_ens, batch_size, rtol, atol)
         
         return x0_sol_list, y0_sol_list, phi_sol_list
 
     end
 
-    function run_body(NN_mb)
+    function run_body(NN_mb, rtol, atol)
 
         GC.gc()
 
@@ -211,7 +211,7 @@ Main.eval("""
         integration_prep = prep_network_integration_mb(NN_mb)
         integrator = configure_ode_solver_mb(NN_mb, integration_prep)
 
-        x0_sol, y0_sol, phi_sol = integrate_ode_mb(NN_mb, integration_prep, integrator)
+        x0_sol, y0_sol, phi_sol = integrate_ode_mb(NN_mb, integration_prep, integrator, rtol, atol)
         
         return x0_sol, y0_sol, phi_sol
 
@@ -304,19 +304,19 @@ Main.eval("""
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 
-    function integrate_ode_mb_ensemble(NN_mb_ens, integration_prep_ens, integrator_ens, batch_size)
+    function integrate_ode_mb_ensemble(NN_mb_ens, integration_prep_ens, integrator_ens, batch_size, rtol, atol)
 
         x0_sol_list, y0_sol_list, phi_sol_list = [], [], []
 
         if NN_mb_ens[1].stiffness == true
 
             sol_ens = solve(integrator_ens, TRBDF2(autodiff=false), EnsembleThreads(), trajectories = size(NN_mb_ens)[1], batch_size = batch_size,
-                            saveat = NN_mb_ens[1].timescale, reltol = 1e-6, abstol = 1e-6, save_everystep = false, maxiters = NN_mb_ens[1].maxiters)
+                            saveat = NN_mb_ens[1].timescale, reltol = rtol, abstol = atol, save_everystep = false, maxiters = NN_mb_ens[1].maxiters)
 
         else
 
             sol_ens = solve(integrator_ens, DP5(), EnsembleThreads(), trajectories = size(NN_mb_ens)[1], batch_size = batch_size,
-                            saveat = NN_mb_ens[1].timescale, reltol = 2.5e-6, abstol = 1e-3, save_everystep = false, maxiters = NN_mb_ens[1].maxiters)
+                            saveat = NN_mb_ens[1].timescale, reltol = rtol, abstol = atol, save_everystep = false, maxiters = NN_mb_ens[1].maxiters)
 
         end
 
@@ -336,15 +336,15 @@ Main.eval("""
 
     end
 
-    function integrate_ode_mb(NN_mb, integration_prep, integrator)
+    function integrate_ode_mb(NN_mb, integration_prep, integrator, rtol, atol)
 
         if NN_mb.stiffness == true
 
-            sol = solve(integrator, TRBDF2(autodiff=false), saveat = NN_mb.timescale, reltol = 1e-6, abstol = 1e-6, save_everystep = false, maxiters = NN_mb.maxiters)
+            sol = solve(integrator, TRBDF2(autodiff=false), saveat = NN_mb.timescale, reltol = rtol, abstol = atol, save_everystep = false, maxiters = NN_mb.maxiters)
 
         else
 
-            sol = solve(integrator, DP5(), saveat = NN_mb.timescale, reltol = 2.5e-6, abstol = 1e-3, save_everystep = false, maxiters = NN_mb.maxiters)
+            sol = solve(integrator, DP5(), saveat = NN_mb.timescale, reltol = rtol, abstol = atol, save_everystep = false, maxiters = NN_mb.maxiters)
 
         end
 

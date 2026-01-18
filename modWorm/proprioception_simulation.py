@@ -20,10 +20,11 @@ from modWorm import Main
 # MASTER FUNCTIONS ##################################################################################################################################
 #####################################################################################################################################################
 
-def run_network(NN_nv, NN_mb, input_mat, extv_mat = False, stiffness_mb = False, interp_method = 'linear'):
+def run_network(NN_nv, NN_mb, input_mat, extv_mat = False, stiffness_mb = False, interp_method = 'linear', 
+                rtol_nv = 5e-6, atol_nv = 1e-3, rtol_mb = 2.5e-6, atol_mb = 1e-3):
 
     integration_prep = prep_integration(NN_nv, NN_mb, input_mat, extv_mat, interp_method)
-    r_nv, r_mb = configure_ode_solver(NN_nv, NN_mb, stiffness_mb)
+    r_nv, r_mb = configure_ode_solver(NN_nv, NN_mb, stiffness_mb, rtol_nv, atol_nv, rtol_mb, atol_mb)
     solution = integrate_ode(NN_nv, NN_mb, r_nv, r_mb, integration_prep)
 
     return solution
@@ -70,23 +71,23 @@ def prep_integration(NN_nv, NN_mb, input_mat, extv_mat, interp_method):
 
     return integration_prep
 
-def configure_ode_solver(NN_nv, NN_mb, stiffness_mb):
+def configure_ode_solver(NN_nv, NN_mb, stiffness_mb, rtol_nv, atol_nv, rtol_mb, atol_mb):
 
     if 'forward_network_Jacobian' in dir(NN_nv):
 
-        r_nv = integrate.ode(NN_nv.forward_Network, NN_nv.forward_network_Jacobian).set_integrator('vode', rtol = 5e-6, atol = 1e-3, method = 'bdf')
+        r_nv = integrate.ode(NN_nv.forward_Network, NN_nv.forward_network_Jacobian).set_integrator('vode', rtol = rtol_nv, atol = atol_nv, method = 'bdf')
 
     else:
 
-        r_nv = integrate.ode(NN_nv.forward_Network).set_integrator('vode', rtol = 5e-6, atol = 1e-3, method = 'bdf')
+        r_nv = integrate.ode(NN_nv.forward_Network).set_integrator('vode', rtol = rtol_nv, atol = atol_nv, method = 'bdf')
 
     if stiffness_mb == False:
 
-        r_mb = integrate.ode(NN_mb.forward_Body).set_integrator('dopri5', rtol = 2.5e-6, atol = 1e-3)
+        r_mb = integrate.ode(NN_mb.forward_Body).set_integrator('dopri5', rtol = rtol_mb, atol = atol_mb)
 
     else:
 
-        r_mb = integrate.ode(NN_mb.forward_Body).set_integrator('Radau', rtol = 1e-6, atol = 1e-6)
+        r_mb = integrate.ode(NN_mb.forward_Body).set_integrator('Radau', rtol = rtol_mb, atol = atol_mb)
 
     r_nv.set_initial_value(NN_nv.initcond, 0)
     r_mb.set_initial_value(NN_mb.initcond, 0)
@@ -146,7 +147,8 @@ def integrate_ode(NN_nv, NN_mb, r_nv, r_mb, integration_prep):
 # MASTER FUNCTIONS (Julia) ##########################################################################################################################
 #####################################################################################################################################################
 
-def run_network_julia_ensemble(NN_nv_ens, NN_mb_ens, input_mat_ens, extv_mat_ens = False, stiffness_mb = False, maxiters_mb = 1e6, verbose_period = False):
+def run_network_julia_ensemble(NN_nv_ens, NN_mb_ens, input_mat_ens, extv_mat_ens = False, stiffness_mb = False, maxiters_mb = 1e6, verbose_period = False, 
+                               rtol_nv = 5e-6, atol_nv = 1e-3, rtol_mb = 2.5e-6, atol_mb = 1e-3):
 
     NN_nv_ens[0].forward_Network()
     NN_nv_ens[0].compute_Vth()
@@ -191,12 +193,13 @@ def run_network_julia_ensemble(NN_nv_ens, NN_mb_ens, input_mat_ens, extv_mat_ens
         vars_NN_nv_ens.append(vars_NN_nv)
         vars_NN_mb_ens.append(vars_NN_mb)
 
-    ppc_solution_dict_ens = Main.run_network_ppc_ensemble(vars_NN_nv_ens, vars_NN_mb_ens, verbose_period)
+    ppc_solution_dict_ens = Main.run_network_ppc_ensemble(vars_NN_nv_ens, vars_NN_mb_ens, verbose_period, rtol_nv, atol_nv, rtol_mb, atol_mb)
     ppc_solution_dict_ens = utils.sort_process_ensemble_sols(ppc_solution_dict_ens, NN_mb_ens)
 
     return ppc_solution_dict_ens
 
-def run_network_julia(NN_nv, NN_mb, input_mat, extv_mat = False, stiffness_mb = False, maxiters_mb = 1e6, verbose_period = False):
+def run_network_julia(NN_nv, NN_mb, input_mat, extv_mat = False, stiffness_mb = False, maxiters_mb = 1e6, verbose_period = False, 
+                      rtol_nv = 5e-6, atol_nv = 1e-3, rtol_mb = 2.5e-6, atol_mb = 1e-3):
 
     NN_nv.forward_Network()
     NN_nv.compute_Vth()
@@ -228,7 +231,7 @@ def run_network_julia(NN_nv, NN_mb, input_mat, extv_mat = False, stiffness_mb = 
     vars_NN_mb["maxiters"] = maxiters_mb
     vars_NN_mb["id"] = 0
 
-    ppc_solution_dict = Main.run_network_ppc(vars_NN_nv, vars_NN_mb, verbose_period)
+    ppc_solution_dict = Main.run_network_ppc(vars_NN_nv, vars_NN_mb, verbose_period, rtol_nv, atol_nv, rtol_mb, atol_mb)
 
     x, y = b_sim.solve_xy(NN_mb, ppc_solution_dict["x0"], ppc_solution_dict["y0"], ppc_solution_dict["phi"])
     x_post, y_post = b_sim.postprocess_xy(NN_mb, x, y)
@@ -240,14 +243,14 @@ def run_network_julia(NN_nv, NN_mb, input_mat, extv_mat = False, stiffness_mb = 
 
 Main.eval("""
 
-    function run_network_ppc_ensemble(NN_nv_ens, NN_mb_ens, verbose_period)
+    function run_network_ppc_ensemble(NN_nv_ens, NN_mb_ens, verbose_period, rtol_nv, atol_nv, rtol_mb, atol_mb)
 
         GC.gc()
 
         NN_nv_ens, NN_mb_ens = construct_NN_ppc_ensemble(NN_nv_ens, NN_mb_ens)
 
         integration_prep_ens = prep_network_integration_ppc_ensemble(NN_nv_ens, NN_mb_ens)
-        integrator_nv_ens, integrator_mb_ens = configure_ode_solver_ppc_ensemble(NN_nv_ens, NN_mb_ens, integration_prep_ens)
+        integrator_nv_ens, integrator_mb_ens = configure_ode_solver_ppc_ensemble(NN_nv_ens, NN_mb_ens, integration_prep_ens, rtol_nv, atol_nv, rtol_mb, atol_mb)
 
         ppc_solution_dict_ens = []
 
@@ -263,14 +266,14 @@ Main.eval("""
 
     end
 
-    function run_network_ppc(NN_nv, NN_mb, verbose_period)
+    function run_network_ppc(NN_nv, NN_mb, verbose_period, rtol_nv, atol_nv, rtol_mb, atol_mb)
 
         GC.gc()
 
         NN_nv, NN_mb = construct_NN_ppc(NN_nv, NN_mb)
 
         integration_prep = prep_network_integration_ppc(NN_nv, NN_mb)
-        integrator_nv, integrator_mb = configure_ode_solver_ppc(NN_nv, NN_mb, integration_prep)
+        integrator_nv, integrator_mb = configure_ode_solver_ppc(NN_nv, NN_mb, integration_prep, rtol_nv, atol_nv, rtol_mb, atol_mb)
 
         ppc_solution_dict = integrate_ode_ppc(NN_nv, NN_mb, integration_prep, integrator_nv, integrator_mb, verbose_period)
         
@@ -360,13 +363,13 @@ Main.eval("""
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 
-    function configure_ode_solver_ppc_ensemble(NN_nv_ens, NN_mb_ens, integration_prep_ens)
+    function configure_ode_solver_ppc_ensemble(NN_nv_ens, NN_mb_ens, integration_prep_ens, rtol_nv, atol_nv, rtol_mb, atol_mb)
 
         integrator_nv_ens, integrator_mb_ens = [], []
 
         for ens_k = 1:size(NN_nv_ens)[1]
 
-            integrator_nv, integrator_mb = configure_ode_solver_ppc(NN_nv_ens[ens_k], NN_mb_ens[ens_k], integration_prep_ens[ens_k])
+            integrator_nv, integrator_mb = configure_ode_solver_ppc(NN_nv_ens[ens_k], NN_mb_ens[ens_k], integration_prep_ens[ens_k], rtol_nv, atol_nv, rtol_mb, atol_mb)
 
             push!(integrator_nv_ens, integrator_nv)
             push!(integrator_mb_ens, integrator_mb)
@@ -377,20 +380,20 @@ Main.eval("""
 
     end
 
-    function configure_ode_solver_ppc(NN_nv, NN_mb, integration_prep)  
+    function configure_ode_solver_ppc(NN_nv, NN_mb, integration_prep, rtol_nv, atol_nv, rtol_mb, atol_mb)  
 
         r_nv = ODEProblem(forward_Network!, NN_nv.initcond, (0, integration_prep.tf), NN_nv)
         r_mb = ODEProblem(forward_Body!, NN_mb.initcond, (0, integration_prep.tf), NN_mb)
 
-        integrator_nv = init(r_nv, CVODE_BDF(), reltol = 5e-6, abstol = 1e-3, save_everystep = false)
+        integrator_nv = init(r_nv, CVODE_BDF(), reltol = rtol_nv, abstol = atol_nv, save_everystep = false)
 
         if NN_mb.stiffness == true
 
-            integrator_mb = init(r_mb, TRBDF2(autodiff=false), reltol = 1e-6, abstol = 1e-6, save_everystep = false, maxiters = NN_mb.maxiters)
+            integrator_mb = init(r_mb, TRBDF2(autodiff=false), reltol = rtol_mb, abstol = atol_mb, save_everystep = false, maxiters = NN_mb.maxiters)
 
         else
 
-            integrator_mb = init(r_mb, Tsit5(), reltol = 2.5e-6, abstol = 1e-3, save_everystep = false, maxiters = NN_mb.maxiters)
+            integrator_mb = init(r_mb, Tsit5(), reltol = rtol_mb, abstol = atol_mb, save_everystep = false, maxiters = NN_mb.maxiters)
 
         end
 

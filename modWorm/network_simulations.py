@@ -58,10 +58,10 @@ def init_Initcond(NN, custom_initcond = None):
 # MASTER FUNCTIONS ##################################################################################################################################
 #####################################################################################################################################################
 
-def run_network(NN, input_mat, extv_mat = False, interp_method = 'linear'):
+def run_network(NN, input_mat, extv_mat = False, interp_method = 'linear', rtol = 5e-6, atol = 1e-3):
 
     integration_prep = prep_network_integration(NN, input_mat, extv_mat, interp_method)
-    solution = integrate_ode(NN, integration_prep)
+    solution = integrate_ode(NN, integration_prep, rtol, atol)
 
     return solution
 
@@ -89,7 +89,7 @@ def prep_network_integration(NN, input_mat, extv_mat, interp_method):
 
     return integration_prep
 
-def integrate_ode(NN, integration_prep):
+def integrate_ode(NN, integration_prep, rtol, atol):
 
     t_eval = np.linspace(0, integration_prep.tf, integration_prep.nsteps)
 
@@ -100,7 +100,7 @@ def integrate_ode(NN, integration_prep):
                                   y0 = NN.initcond, 
                                   method = 'BDF',
                                   t_eval = t_eval,
-                                  rtol = 1e-8, atol = 1e-8)
+                                  rtol = rtol, atol = atol)
 
         v_sol = sol.y[0, :]
         cv_sol = sol.y[1:, :]
@@ -118,7 +118,7 @@ def integrate_ode(NN, integration_prep):
                                       y0 = NN.initcond, 
                                       method = 'BDF',
                                       t_eval = t_eval,
-                                      rtol = 1e-8, atol = 1e-8)
+                                      rtol = rtol, atol = atol)
 
         else:
 
@@ -127,7 +127,7 @@ def integrate_ode(NN, integration_prep):
                                       y0 = NN.initcond, 
                                       method = 'BDF',
                                       t_eval = t_eval,
-                                      rtol = 1e-8, atol = 1e-8)
+                                      rtol = rtol, atol = atol  )
 
         v_sol = sol.y[:NN.network_Size, :].T
         s_sol = sol.y[NN.network_Size:NN.network_Size*2, :].T
@@ -150,7 +150,7 @@ def integrate_ode(NN, integration_prep):
 # MASTER FUNCTIONS (Julia) ##########################################################################################################################
 #####################################################################################################################################################
 
-def run_network_julia_ensemble(NN_ens, input_mat_ens, extv_mat_ens = False, batch_size = 8):
+def run_network_julia_ensemble(NN_ens, input_mat_ens, extv_mat_ens = False, batch_size = 8, rtol = 5e-6, atol = 1e-3):
 
     NN_ens[0].forward_Network()
 
@@ -185,11 +185,11 @@ def run_network_julia_ensemble(NN_ens, input_mat_ens, extv_mat_ens = False, batc
 
         NN_ens[0].compute_Vth()
 
-    nv_solution_dict_ens = Main.run_network_ensemble(vars_NN_ens, batch_size)
+    nv_solution_dict_ens = Main.run_network_ensemble(vars_NN_ens, batch_size, rtol, atol)
 
     return nv_solution_dict_ens
 
-def run_network_julia(NN, input_mat, extv_mat = False):
+def run_network_julia(NN, input_mat, extv_mat = False, rtol = 5e-6, atol = 1e-3):
 
     NN.forward_Network()
 
@@ -211,13 +211,13 @@ def run_network_julia(NN, input_mat, extv_mat = False):
 
         NN.compute_Vth()
 
-    nv_solution_dict = Main.run_network(vars_NN)
+    nv_solution_dict = Main.run_network(vars_NN, rtol, atol)
 
     return nv_solution_dict
 
 Main.eval("""
 
-    function run_network_ensemble(NN_ens, batch_size)
+    function run_network_ensemble(NN_ens, batch_size, rtol, atol)
 
         GC.gc()
 
@@ -226,12 +226,12 @@ Main.eval("""
         integration_prep_ens = prep_network_integration_nv_ensemble(NN_ens)
         integrator_ens = configure_ode_solver_nv_ensemble(NN_ens, integration_prep_ens)
 
-        sol = integrate_ode_nv_ensemble(NN_ens, integration_prep_ens, integrator_ens, batch_size)
+        sol = integrate_ode_nv_ensemble(NN_ens, integration_prep_ens, integrator_ens, batch_size, rtol, atol)
         return sol
 
     end
 
-    function run_network(NN)
+    function run_network(NN, rtol, atol)
 
         GC.gc()
 
@@ -240,7 +240,7 @@ Main.eval("""
         integration_prep = prep_network_integration_nv(NN)
         integrator = configure_ode_solver_nv(NN, integration_prep)
 
-        sol = integrate_ode_nv(NN, integration_prep, integrator)
+        sol = integrate_ode_nv(NN, integration_prep, integrator, rtol, atol)
         return sol
 
     end
@@ -350,12 +350,12 @@ Main.eval("""
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 
-    function integrate_ode_nv_ensemble(NN_ens, integration_prep_ens, integrator_ens, batch_size)
+    function integrate_ode_nv_ensemble(NN_ens, integration_prep_ens, integrator_ens, batch_size, rtol, atol)
 
         nv_solution_dict_ens = []
 
         sol_ens = solve(integrator_ens, CVODE_BDF(), EnsembleThreads(), trajectories = size(NN_ens)[1], batch_size = batch_size, 
-                        saveat = NN_ens[1].timescale, reltol = 1e-8, abstol = 1e-8, save_everystep = false)
+                        saveat = NN_ens[1].timescale, reltol = rtol, abstol = atol, save_everystep = false)
 
         for ens_k in 1:size(NN_ens)[1]
 
@@ -398,9 +398,9 @@ Main.eval("""
 
     end
 
-    function integrate_ode_nv(NN, integration_prep, integrator)
+    function integrate_ode_nv(NN, integration_prep, integrator, rtol, atol)
 
-        sol = solve(integrator, CVODE_BDF(), saveat = NN.timescale, reltol = 1e-8, abstol = 1e-8, save_everystep = false)
+        sol = solve(integrator, CVODE_BDF(), saveat = NN.timescale, reltol = rtol, abstol = atol, save_everystep = false)
 
         if NN.network_Size == 1
 
