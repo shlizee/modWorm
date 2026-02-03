@@ -9,6 +9,7 @@ import os
 import numpy as np
 import pandas as pd
 import json
+import platform
 
 from scipy import signal, interpolate
 from scipy.ndimage import gaussian_filter
@@ -20,6 +21,8 @@ from modWorm import network_dynamics as n_dyn
 from modWorm import network_interactions as n_inter
 from modWorm import body_simulations as b_sim
 from modWorm import Main
+
+platform = platform.system()
 
 #####################################################################################################################################################
 # IMPORT FUNCTIONS ##################################################################################################################################
@@ -40,8 +43,15 @@ def load_Json(filename):
 
 def construct_connectome_Varshney(filepath):
 
-    conn_gap_delta = np.load(paths.data_dir + "\\conn_gap_adjust_Varshney.npy")
-    conn_syn_delta = np.load(paths.data_dir + "\\conn_syn_adjust_Varshney.npy")
+    if platform == 'Windows':
+
+        conn_gap_delta = np.load(paths.data_dir + "\\conn_gap_adjust_Varshney.npy")
+        conn_syn_delta = np.load(paths.data_dir + "\\conn_syn_adjust_Varshney.npy")
+
+    else:
+
+        conn_gap_delta = np.load(paths.data_dir + "/conn_gap_adjust_Varshney.npy")
+        conn_syn_delta = np.load(paths.data_dir + "/conn_syn_adjust_Varshney.npy")
 
     conn_syn = np.zeros((279, 279))
     conn_gap = np.zeros((279, 279))
@@ -106,8 +116,15 @@ def construct_connectome_Varshney(filepath):
 
 def construct_connectome_Cook(filepath):
 
-    conn_gap_delta = np.load(paths.data_dir + "\\conn_gap_adjust_Cook.npy")
-    conn_syn_delta = np.load(paths.data_dir + "\\conn_syn_adjust_Cook.npy")
+    if platform == 'Windows':
+
+        conn_gap_delta = np.load(paths.data_dir + "\\conn_gap_adjust_Cook.npy")
+        conn_syn_delta = np.load(paths.data_dir + "\\conn_syn_adjust_Cook.npy")
+
+    else:
+
+        conn_gap_delta = np.load(paths.data_dir + "/conn_gap_adjust_Cook.npy")
+        conn_syn_delta = np.load(paths.data_dir + "/conn_syn_adjust_Cook.npy")
 
     conn_syn = np.zeros((279, 279))
     conn_gap = np.zeros((279, 279))
@@ -154,7 +171,14 @@ def construct_connectome_Cook(filepath):
 def construct_muscle_map_Hall(filepath):
         
     muscle_map = pd.read_excel(filepath).to_numpy()
-    muscle_map_delta = np.load(paths.muscle_maps_dir + "\\muscle_map_adjust.npy")
+    
+    if platform == 'Windows':
+
+        muscle_map_delta = np.load(paths.muscle_maps_dir + "\\muscle_map_adjust.npy")
+
+    else:
+
+        muscle_map_delta = np.load(paths.muscle_maps_dir + "/muscle_map_adjust.npy")
     
     muscle_seg_names = ['MDL', 'MDR', 'MVL', 'MVR']
     muscle_seg_nums = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
