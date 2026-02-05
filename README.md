@@ -1,5 +1,7 @@
 # modWorm
 
+[Official Introduction Page](https://shlizee.github.io/modWorm/)
+
 modWorm is a generic modeling framework for modular simulation of neural connectomics, dynamics and biomechanics of Caenorhabditis elegans (C. elegans).
 \
 \
