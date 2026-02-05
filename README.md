@@ -20,4 +20,4 @@ DifferentialEquations, OrdinaryDiffEq, Sundials, LinearAlgebra, LogExpFunctions,
 If you are using this package please cite the following:
 \
 \
-[Kim, J., Florman, J. T., Santos, J. A., Alkema, M. J., & Shlizerman, E. (2025). Modular integration of neural connectomics, dynamics and biomechanics for identification of behavioral sensorimotor pathways in Caenorhabditis elegans. bioRxiv, 724328.]
+[Kim, J., Florman, J. T., Santos, J. A., Alkema, M. J., & Shlizerman, E. (2025). Modular integration of neural connectomics, dynamics and biomechanics for identification of behavioral sensorimotor pathways in Caenorhabditis elegans. bioRxiv, 724328.] [LINK TO THE PAPER](https://www.biorxiv.org/content/10.1101/724328v3)
