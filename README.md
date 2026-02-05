@@ -19,7 +19,10 @@ DifferentialEquations, OrdinaryDiffEq, Sundials, LinearAlgebra, LogExpFunctions,
 
 # Installation and Tutorial
 
-You can find installation instruction for both Mac and Windows under /pdf_tutorials. Once installed, use jupyter notebook navigator to open quick start tutorials under /ipynb_tutorials folder. You can also find the tutorial slides going over tutorial notebooks "modWorm quick-start.pdf" under /pdf_tutorials.
+You can find installation instruction for both Mac and Windows under /pdf_tutorials. Once installed, use jupyter notebook navigator to open quick start tutorials under /ipynb_tutorials folder. 
+\
+\
+You can also find the tutorial slides going over tutorial notebooks "modWorm quick-start.pdf" under /pdf_tutorials.
 
 # How to cite
 
