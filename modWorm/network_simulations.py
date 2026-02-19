@@ -17,40 +17,34 @@ from modWorm import utils
 # CONSTRUCTORS ######################################################################################################################################
 #####################################################################################################################################################
 
-def init_Initcond(NN, custom_initcond = None):
+def init_Initcond(NN):
 
-    if custom_initcond != None:
+    if NN.network_Size == 1:
 
-        return custom_initcond
+        voltage_initcond = 10**(-4)*np.random.normal(0, 0.94, 1)
 
-    else:
+        if 'ic_var_length' in dir(NN):
 
-        if NN.network_Size == 1:
-
-            voltage_initcond = 10**(-4)*np.random.normal(0, 0.94, 1)
-
-            if 'ic_var_length' in dir(NN):
-
-                channel_initcond = NN.ic_initcond
-                full_initcond = np.concatenate([voltage_initcond, channel_initcond])
-
-            else:
-
-                full_initcond = np.concatenate([voltage_initcond])
+            channel_initcond = NN.ic_initcond
+            full_initcond = np.concatenate([voltage_initcond, channel_initcond])
 
         else:
 
-            voltage_initcond = 10**(-4)*np.random.normal(0, 0.94, NN.network_Size)
-            synaptic_initcond = 10**(-4)*np.random.normal(0, 0.94, NN.network_Size)
+            full_initcond = np.concatenate([voltage_initcond])
 
-            if 'ic_var_length' in dir(NN):
+    else:
 
-                channel_initcond = NN.ic_initcond
-                full_initcond = np.concatenate([voltage_initcond, synaptic_initcond, channel_initcond])
+        voltage_initcond = 10**(-4)*np.random.normal(0, 0.94, NN.network_Size)
+        synaptic_initcond = 10**(-4)*np.random.normal(0, 0.94, NN.network_Size)
 
-            else:
+        if 'ic_var_length' in dir(NN):
 
-                full_initcond = np.concatenate([voltage_initcond, synaptic_initcond])
+            channel_initcond = NN.ic_initcond
+            full_initcond = np.concatenate([voltage_initcond, synaptic_initcond, channel_initcond])
+
+        else:
+
+            full_initcond = np.concatenate([voltage_initcond, synaptic_initcond])
 
     return full_initcond
 
